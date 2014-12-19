@@ -1,5 +1,4 @@
 import static org.junit.Assert.*;
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -21,7 +20,7 @@ public class DatabaseTest {
 	 */
 	@Test
 	public void testDatabaseNotNull() {
-		Assert.assertNotNull(new Database());
+		assertNotNull(new Database());
 	}
 
 	/**
@@ -31,7 +30,7 @@ public class DatabaseTest {
 	public void testNotExistingUser() {
 		database = new Database();
 		String username = "hello";
-		Assert.assertFalse(database.user(username));
+		assertFalse(database.user(username));
 		database.quit();
 	}
 	
@@ -43,7 +42,7 @@ public class DatabaseTest {
 	public void testExistingUserUnlockedMaildrop() {
 		database = new Database();
 		String username = "alex";
-		Assert.assertTrue(database.user(username));
+		assertTrue(database.user(username));
 		database.quit();
 	}
 
@@ -54,7 +53,7 @@ public class DatabaseTest {
 	public void testPassBeforeCorrectUser() {
 		database = new Database();
 		String password = "hello123";
-		Assert.assertFalse(database.pass(password));
+		assertFalse(database.pass(password));
 		database.quit();
 	}
 	
@@ -67,7 +66,7 @@ public class DatabaseTest {
 		String user = "alex";
 		database.user(user);
 		String password = "password";
-		Assert.assertFalse(database.pass(password));
+		assertFalse(database.pass(password));
 		database.quit();
 	}
 	
@@ -80,7 +79,7 @@ public class DatabaseTest {
 		String user = "alex";
 		database.user(user);
 		String password = "hello123";
-		Assert.assertTrue(database.pass(password)); //will lock maildrop
+		assertTrue(database.pass(password)); //will lock maildrop
 		database.quit(); // releases maildrop
 	}
 
@@ -94,7 +93,7 @@ public class DatabaseTest {
 		database.user(user);
 		String password = "hello123";
 		database.pass(password);
-		Assert.assertTrue(database.quit());
+		assertTrue(database.quit());
 	}
 
 	/**
@@ -109,7 +108,7 @@ public class DatabaseTest {
 		database.pass(password);
 		String totalMails = "3";
 		String totalSize = "173293";
-		Assert.assertEquals(totalMails+" "+totalSize, database.stat());
+		assertEquals(totalMails+" "+totalSize, database.stat());
 		database.quit();
 	}
 
@@ -131,7 +130,7 @@ public class DatabaseTest {
 				"3 169270" +CRLF+
 				".";
 		
-		Assert.assertEquals(listOutput, database.list());
+		assertEquals(listOutput, database.list());
 		database.quit();
 	}
 
@@ -149,7 +148,7 @@ public class DatabaseTest {
 		int mailSize = 2722;
 		
 		String listOutput = mailNum+" "+mailSize;	
-		Assert.assertEquals(listOutput, database.list(mailNum-1));
+		assertEquals(listOutput, database.list(mailNum-1));
 		database.quit();
 	}
 
@@ -172,7 +171,7 @@ public class DatabaseTest {
 		String password = "hello123";
 		database.pass(password);
 		int mailNum = 2;
-		Assert.assertTrue(database.dele(mailNum-1));
+		assertTrue(database.dele(mailNum-1));
 		database.quit();
 	}
 	
@@ -187,7 +186,7 @@ public class DatabaseTest {
 		String password = "hello123";
 		database.pass(password);
 		int mailNum = 10000000;
-		Assert.assertFalse(database.dele(mailNum-1));
+		assertFalse(database.dele(mailNum-1));
 		database.quit();
 	}
 
@@ -235,7 +234,7 @@ public class DatabaseTest {
 		database.pass(password);
 		int totalMail = 2; // after one is deleted
 	
-		Assert.assertEquals(totalMail, database.getTotalMailsNumber());
+		assertEquals(totalMail, database.getTotalMailsNumber());
 		database.quit();
 	}
 
@@ -250,7 +249,7 @@ public class DatabaseTest {
 		String password = "hello123";
 		database.pass(password);
 		int totalMailSize = 170571; // after one is deleted
-		Assert.assertEquals(totalMailSize, database.getTotalMailsSize());
+		assertEquals(totalMailSize, database.getTotalMailsSize());
 		database.quit();
 	}
 
@@ -265,7 +264,7 @@ public class DatabaseTest {
 		String password = "hello123";
 		database.pass(password);
 		int mailNum = 1; 
-		Assert.assertTrue(database.exists(mailNum));
+		assertTrue(database.exists(mailNum));
 		database.quit();
 	}
 
