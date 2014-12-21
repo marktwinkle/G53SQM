@@ -46,16 +46,21 @@ public class Database implements DatabaseInterface {
 
 	private List <Integer> mailList;
 	private int loggedUserID;
+	
+	private boolean testBool;
+	private int testInt;
 
 	public Database() {
 		loggedUserID = INVALID_USER_ID;
 		mailList = new ArrayList <Integer> ();
-		establishDatabaseConnection();
+		//establishDatabaseConnection();
+		testBool = true;
+		testInt = 5;
 	}
 
 	@Override
 	public boolean user(String username) {
-		try {
+		/*try {
 			loggedUserID = INVALID_USER_ID;
 
 			String mailQuety = "Select vchUsername, iMaildropID from m_Maildrop where vchUsername = \""+ username+"\"";
@@ -66,12 +71,12 @@ public class Database implements DatabaseInterface {
 
 		} catch (SQLException sqlException) {
 			System.err.println("Unable to load Maildrop");
-		}
-		return false;
+		}*/
+		return testBool;
 	}
 
 	public boolean pass(String password) {
-		if (loggedUserID != INVALID_USER_ID) {
+		/*if (loggedUserID != INVALID_USER_ID) {
 			try {
 				String mailQuety = "Select vchPassword, tiLocked from m_Maildrop where iMaildropID = "+ loggedUserID;
 				resultSet = statement.executeQuery(mailQuety);
@@ -87,54 +92,55 @@ public class Database implements DatabaseInterface {
 				sqlException.printStackTrace();
 				System.err.println("Problem loading data from Database");
 			}	
-		}
+		}*/
 		loggedUserID = INVALID_USER_ID;
-		return false;
+		return testBool;
 	}
 
 	public boolean quit() {
-		return deleteMails() && releaseLock(loggedUserID);
+		/*return deleteMails() && releaseLock(loggedUserID);*/
+		return testBool;
 	}
 
 	public String stat() {
-		String response;
+		String response = "";
 
-		response = getTotalMailsNumber()+" "+getTotalMailsSize();
+		/*response = getTotalMailsNumber()+" "+getTotalMailsSize();*/
 		return response;
 	}
 
 	public String list() {
-		String response;		
-		response = getTotalMailsNumber() +" messages ("+getTotalMailsSize()+" octets)"+CRLF;
+		String response = "";		
+		/*response = getTotalMailsNumber() +" messages ("+getTotalMailsSize()+" octets)"+CRLF;
 
 		for (int i = 0 ; i < mailList.size() ; i++) {
 			if (!isDeleted(i)){
 				response += (i+1)+" "+ mailSize(i)+CRLF;
 			}
 		}
-		response += TERMINATION_OCTET;
+		response += TERMINATION_OCTET;*/
 		return response;
 	}
 
 	public String list(int mailNum) {
-		String response;
+		String response = "";
 
-		response = (mailNum+1)+" "+ mailSize(mailNum);
+		/*response = (mailNum+1)+" "+ mailSize(mailNum);*/
 		return response;
 	}
 
 	public String retr(int mailNum) {
-		String response;
+		String response = "";
 
-		response = 	 mailSize(mailNum)+" octets"+CRLF+
+		/*response = 	 mailSize(mailNum)+" octets"+CRLF+
 				mailHeader(mailNum)+CRLF+
 				mailBody(mailNum)+CRLF;
-		response += TERMINATION_OCTET;
+		response += TERMINATION_OCTET;*/
 		return response;
 	}
 
 	public boolean dele(int mailNum) {
-		try {
+		/*try {
 			String mailQuery = "Update m_Mail set markedForDeletion = 1 where iMailID = "+ mailList.get(mailNum);
 			statement.executeUpdate(mailQuery);
 			mailList.remove(mailNum);
@@ -143,8 +149,8 @@ public class Database implements DatabaseInterface {
 			System.err.println("Unable to mark for deletion");
 		} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
 			System.err.println("Invalid mail number");
-		}
-		return false;
+		}*/
+		return testBool;
 	}
 
 	public void noop() {
@@ -152,20 +158,20 @@ public class Database implements DatabaseInterface {
 	}
 
 	public void rset() {
-		loadMails(loggedUserID);
+		/*loadMails(loggedUserID);
 		int mailListSize = mailList.size();
 		for ( int i = 0 ; i < mailListSize ; i ++) {
 			if(isDeleted(i)) {
 				unmarkDelete(i);	
 			}
-		}
+		}*/
 	}
 
 	public String top(int mailNum, int lines) {
-		String response;
+		String response = "";
 		String [] body;
 
-		response = CRLF;
+		/*response = CRLF;
 		response += mailHeader(mailNum);
 		response += "\n\n";
 		body = mailBody(mailNum).split("\n");
@@ -178,30 +184,30 @@ public class Database implements DatabaseInterface {
 		for (int i = 0 ; i < lines ; i++) {
 			response += body[i]+"\n";
 		}
-		response += TERMINATION_OCTET;
+		response += TERMINATION_OCTET;*/
 		return response;
 
 	}
 
 	public String uidl() {
-		String response;
+		String response = "";
 
-		response = CRLF;
+		/*response = CRLF;
 		int totalMailsNum =  getTotalMailsNumber();
 		for (int i = 0 ; i < totalMailsNum ; i++) {
 			if (!isDeleted(i)){
 				response += uidl(i)+CRLF;
 			}
 		}
-		response += TERMINATION_OCTET;
+		response += TERMINATION_OCTET;*/
 		return response;
 
 	}
 
 	public String uidl(int mailNum) {
-		String response;
+		String response = "";
 
-		try {
+		/*try {
 			String mailQuety = "Select vchUIDL from m_Mail where iMailID = "+ mailList.get(mailNum);
 			resultSet = statement.executeQuery(mailQuety);
 			resultSet.next();
@@ -209,16 +215,17 @@ public class Database implements DatabaseInterface {
 			return response;
 		} catch (SQLException sqlException) {
 			System.err.println("Unable to get UIDL for message " + mailNum);
-		}
+		}*/
 		return null;
 	}
 
 	public boolean exists(int mailNum) {
-		return mailNum >= 0 && mailList.size() > mailNum && !isDeleted(mailNum);
+		/*return mailNum >= 0 && mailList.size() > mailNum && !isDeleted(mailNum);*/
+		return testBool;
 	}
 
 	public boolean releaseLock(int userId) {
-		if (loggedUserID != INVALID_USER_ID) {
+		/*if (loggedUserID != INVALID_USER_ID) {
 			try {
 				String mailQuery = "Update m_Maildrop set tiLocked = 0 where iMaildropID = "+ userId;
 				statement.executeUpdate(mailQuery);
@@ -229,8 +236,8 @@ public class Database implements DatabaseInterface {
 				System.err.println("Can't release the user lock in maildrop");
 				sqlException.printStackTrace();
 			}
-		}
-		return false;
+		}*/
+		return testBool;
 	}
 	
 	public int getLoggedUserId() {
@@ -238,24 +245,26 @@ public class Database implements DatabaseInterface {
 	}
 	
 	public int getTotalMailsNumber() {
-		int total = 0;
+		/*int total = 0;
 		for (int i = 0 ; i < mailList.size() ; i++) {
 			if (!isDeleted(i)) {
 				total ++;
 			}
 		}
-		return total;
+		return total;*/
+		return testInt;
 	}
 
 	
 	public int getTotalMailsSize() {
-		int totalSize = 0;
+		/*int totalSize = 0;
 		for (int i = 0 ; i < mailList.size() ; i++) {
 			if (!isDeleted(i)) {
 				totalSize += mailSize(i);
 			}
 		}
-		return totalSize;
+		return totalSize;*/
+		return testInt;
 	}
 
 	//start of private methods ------------------------------------------------------------
