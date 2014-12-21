@@ -35,21 +35,16 @@ public class CommandInterpreterTest {
 		assertTrue(command.handleInput(input).equals(ERR+"Invalid command"+" "+input+CRLF));
 	}
 
-	@Test
-	public void testCommandInvalidArguemtns1() {
-		String input = "PASS";
-		assertTrue(!command.isValidArgs(input));
-	}
 
 	@Test
 	public void testCommandInvalidArguemtns2() {
-		String input = "TOP 2";
+		String input = "STAT 2";
 		assertTrue(!command.isValidArgs(input));
 	}
 	
 	@Test
 	public void testCommandInvalidArguemtns3() {
-		String input = "PASS " +
+		String input = "USER " +
 				"0123456789" +
 				"0123456789" +
 				"0123456789" +
@@ -71,22 +66,8 @@ public class CommandInterpreterTest {
 		assertTrue(command.handleInput(input).equals(ERR+inputline[ARGUMENT_ONE]+" mailbox does not exist"+" "+input+CRLF));
 	}
 
-	@Test
-	public void testPassOk() {
-		String input = "USER alex";
-		command.handleInput(input);
-		input = "PASS hello123";
-		assertTrue(command.handleInput(input).equals(OK+"welcome to mailbox"+" "+input+CRLF));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
-	}
 
-	@Test
-	public void testPassErr() {
-		String input = "PASS basswood";
-		assertTrue(command.handleInput(input).equals(ERR+"incorrect password"+" "+input+CRLF));
-	}
-
+	
 	@Test
 	public void testStatOk() {
 		String input = "USER alex";
@@ -111,77 +92,7 @@ public class CommandInterpreterTest {
 		command.getDatabase().releaseLock(userId);
 	}
 
-	@Test
-	public void testListOk2() {
-		String input = "USER alex";
-		command.handleInput(input);
-		input = "PASS hello123";
-		command.handleInput(input);
-		input = "LIST 2";
-		assertTrue(command.handleInput(input).split(" ")[0].equals(OK.trim()));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
-	}
 
-	@Test
-	public void testListErr() {
-		String input = "USER alex";
-		command.handleInput(input);
-		input = "PASS hello123";
-		command.handleInput(input);
-		input = "LIST -3";
-		assertTrue(command.handleInput(input).split(" ")[0].equals(ERR.trim()));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
-	}
-
-	@Test
-	public void testRetrOk() {
-		String input = "USER alex";
-		command.handleInput(input);
-		input = "PASS hello123";
-		command.handleInput(input);
-		input = "RETR 1";
-		assertTrue(command.handleInput(input).split(" ")[0].equals(OK.trim()));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
-	}
-
-	@Test
-	public void testRetrErr() {
-		String input = "USER alex";
-		command.handleInput(input);
-		input = "PASS hello123";
-		command.handleInput(input);
-		input = "RETR -1";
-		assertTrue(command.handleInput(input).split(" ")[0].equals(ERR.trim()));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
-	}
-
-	@Test
-	public void testNoopOk() {
-		String input = "USER alex";
-		command.handleInput(input);
-		input = "PASS hello123";
-		command.handleInput(input);
-		input = "NOOP";
-		assertTrue(command.handleInput(input).split(" ")[0].equals(OK.trim()));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
-	}
-
-	@Test
-	public void testRsetOk() {
-		String input = "USER alex";
-		command.handleInput(input);
-		input = "PASS hello123";
-		command.handleInput(input);
-		input = "RSET";
-		assertTrue(command.handleInput(input).split(" ")[0].equals(OK.trim()));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
-	}
 
 	@Test
 	public void testQuitOk() {
@@ -204,8 +115,6 @@ public class CommandInterpreterTest {
 	public void testStateChange1() {
 		String input = "USER alex";
 		command.handleInput(input);
-		input = "PASS hello123";
-		command.handleInput(input);
 		assertTrue(command.getState() == TRANSACTION);
 		int userId = command.getDatabase().getLoggedUserId();
 		command.getDatabase().releaseLock(userId);
@@ -214,8 +123,6 @@ public class CommandInterpreterTest {
 	@Test
 	public void testStateChange2() {
 		String input = "USER alex";
-		command.handleInput(input);
-		input = "PASS hello123";
 		command.handleInput(input);
 		input = "QUIT";
 		command.handleInput(input);
