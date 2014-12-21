@@ -37,6 +37,7 @@ import java.util.List;
 
 public class Database implements DatabaseInterface {
 
+	
 	private final String TERMINATION_OCTET = ".";
 	private final String CRLF = "\r\n";
 	private final int INVALID_USER_ID = -1;
@@ -44,7 +45,7 @@ public class Database implements DatabaseInterface {
 	private Statement statement;
 	private ResultSet resultSet;
 
-	private List <Integer> mailList;
+	private List <Integer> messagesList;
 	private int loggedUserID;
 	
 	private boolean testBool;
@@ -52,11 +53,12 @@ public class Database implements DatabaseInterface {
 
 	public Database() {
 		loggedUserID = INVALID_USER_ID;
-		mailList = new ArrayList <Integer> ();
+		messagesList = new ArrayList <Integer> ();
 		//establishDatabaseConnection();
 		testBool = true;
 		testInt = 5;
 	}
+	
 
 	@Override
 	public boolean user(String username) {
@@ -75,40 +77,13 @@ public class Database implements DatabaseInterface {
 		return testBool;
 	}
 
-	public boolean pass(String password) {
-		/*if (loggedUserID != INVALID_USER_ID) {
-			try {
-				String mailQuety = "Select vchPassword, tiLocked from m_Maildrop where iMaildropID = "+ loggedUserID;
-				resultSet = statement.executeQuery(mailQuety);
-				resultSet.next();
-
-				if (resultSet.getString("vchPassword").equals(password) && resultSet.getString("tiLocked").equals("0")) {
-					return loadMails(loggedUserID) && getLock(loggedUserID);
-				}
-			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-				System.err.println("Incorrect user login");
-				indexOutOfBoundsException.printStackTrace();
-			} catch (SQLException sqlException) {
-				sqlException.printStackTrace();
-				System.err.println("Problem loading data from Database");
-			}	
-		}*/
-		loggedUserID = INVALID_USER_ID;
-		return testBool;
-	}
-
+	@Override
 	public boolean quit() {
 		/*return deleteMails() && releaseLock(loggedUserID);*/
 		return testBool;
 	}
 
-	public String stat() {
-		String response = "";
-
-		/*response = getTotalMailsNumber()+" "+getTotalMailsSize();*/
-		return response;
-	}
-
+	@Override
 	public String list() {
 		String response = "";		
 		/*response = getTotalMailsNumber() +" messages ("+getTotalMailsSize()+" octets)"+CRLF;
@@ -122,169 +97,42 @@ public class Database implements DatabaseInterface {
 		return response;
 	}
 
-	public String list(int mailNum) {
-		String response = "";
-
-		/*response = (mailNum+1)+" "+ mailSize(mailNum);*/
-		return response;
-	}
-
-	public String retr(int mailNum) {
-		String response = "";
-
-		/*response = 	 mailSize(mailNum)+" octets"+CRLF+
-				mailHeader(mailNum)+CRLF+
-				mailBody(mailNum)+CRLF;
-		response += TERMINATION_OCTET;*/
-		return response;
-	}
-
-	public boolean dele(int mailNum) {
-		/*try {
-			String mailQuery = "Update m_Mail set markedForDeletion = 1 where iMailID = "+ mailList.get(mailNum);
-			statement.executeUpdate(mailQuery);
-			mailList.remove(mailNum);
-			return true;
-		} catch (SQLException sqlException) {
-			System.err.println("Unable to mark for deletion");
-		} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-			System.err.println("Invalid mail number");
-		}*/
-		return testBool;
-	}
-
-	public void noop() {
-
-	}
-
-	public void rset() {
-		/*loadMails(loggedUserID);
-		int mailListSize = mailList.size();
-		for ( int i = 0 ; i < mailListSize ; i ++) {
-			if(isDeleted(i)) {
-				unmarkDelete(i);	
-			}
-		}*/
-	}
-
-	public String top(int mailNum, int lines) {
-		String response = "";
-		String [] body;
-
-		/*response = CRLF;
-		response += mailHeader(mailNum);
-		response += "\n\n";
-		body = mailBody(mailNum).split("\n");
-
-
-		if (lines > body.length) {
-			response += mailBody(mailNum);
-			return response;
-		}
-		for (int i = 0 ; i < lines ; i++) {
-			response += body[i]+"\n";
-		}
-		response += TERMINATION_OCTET;*/
-		return response;
-
-	}
-
-	public String uidl() {
-		String response = "";
-
-		/*response = CRLF;
-		int totalMailsNum =  getTotalMailsNumber();
-		for (int i = 0 ; i < totalMailsNum ; i++) {
-			if (!isDeleted(i)){
-				response += uidl(i)+CRLF;
-			}
-		}
-		response += TERMINATION_OCTET;*/
-		return response;
-
-	}
-
-	public String uidl(int mailNum) {
-		String response = "";
-
-		/*try {
-			String mailQuety = "Select vchUIDL from m_Mail where iMailID = "+ mailList.get(mailNum);
-			resultSet = statement.executeQuery(mailQuety);
-			resultSet.next();
-			response = (mailNum+1)+" "+resultSet.getString("vchUIDL");
-			return response;
-		} catch (SQLException sqlException) {
-			System.err.println("Unable to get UIDL for message " + mailNum);
-		}*/
-		return null;
-	}
-
-	public boolean exists(int mailNum) {
-		/*return mailNum >= 0 && mailList.size() > mailNum && !isDeleted(mailNum);*/
-		return testBool;
-	}
-
-	public boolean releaseLock(int userId) {
-		/*if (loggedUserID != INVALID_USER_ID) {
-			try {
-				String mailQuery = "Update m_Maildrop set tiLocked = 0 where iMaildropID = "+ userId;
-				statement.executeUpdate(mailQuery);
-				statement.close();
-				databaseConnection.close();
-				return true;
-			} catch (SQLException sqlException) {
-				System.err.println("Can't release the user lock in maildrop");
-				sqlException.printStackTrace();
-			}
-		}*/
-		return testBool;
-	}
-	
+	@Override
 	public int getLoggedUserId() {
 		return loggedUserID;
 	}
-	
-	public int getTotalMailsNumber() {
-		/*int total = 0;
-		for (int i = 0 ; i < mailList.size() ; i++) {
-			if (!isDeleted(i)) {
-				total ++;
-			}
-		}
-		return total;*/
-		return testInt;
+
+	@Override
+	public String stat() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	
-	public int getTotalMailsSize() {
-		/*int totalSize = 0;
-		for (int i = 0 ; i < mailList.size() ; i++) {
-			if (!isDeleted(i)) {
-				totalSize += mailSize(i);
-			}
-		}
-		return totalSize;*/
-		return testInt;
-	}
-
-	//start of private methods ------------------------------------------------------------
-	
-
-	/**
-	 * Obtains lock for user in maildrop
-	 * @param userId: the id for user logged in
-	 * @return true: if lock is successfully obtained, false: otherwise
-	 */
-	private boolean getLock(int userId) {
-		try {
-			String mailQuery = "Update m_Maildrop set tiLocked = 1 where iMaildropID = "+ userId;
-			statement.executeUpdate(mailQuery);
-			return true;
-		} catch (SQLException sqlException) {
-			System.err.println("Can't obtain the user lock in maildrop");
-		}
+	@Override
+	public boolean mesg(String destinationUser, String messageText) {
+		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public boolean hail() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String myMsgs() {
+		String messages = "";
+		loadMessages();
+		messages = stringMessages();
+		deleteMessages();
+		return messages;
+	}
+	
+
+	
+
+	//start of private methods ------------------------------------------------------------
 
 	/**
 	 * Creates Connections and Statement objects to interact with the MySQL server
@@ -309,16 +157,16 @@ public class Database implements DatabaseInterface {
 	}
 
 	/**
-	 * Loads the IDs of mails corresponding to specified user into a list
-	 * @return true: if successfully loaded IDs into the list, false: otherwise
+	 * Loads the IDs of messages corresponding to specified user into a list
+	 * @return true: if successfully loaded message IDs into the list, false: otherwise
 	 */
-	private boolean loadMails(int userId) {
+	private boolean loadMessages() {
 		try {
-			mailList.clear();
-			String mailQuery = "Select iMailID from m_Mail where iMaildropID = "+ userId;
+			messagesList.clear();
+			String mailQuery = "Select iMailID from m_Mail where iMaildropID = "+ loggedUserID;
 			resultSet = statement.executeQuery(mailQuery);
 			while(resultSet.next()) {
-				mailList.add(Integer.parseInt(resultSet.getString("iMailID")));
+				messagesList.add(Integer.parseInt(resultSet.getString("iMailID")));
 			}
 			return true;
 		} catch (SQLException sqlException) {
@@ -327,29 +175,23 @@ public class Database implements DatabaseInterface {
 		return false;
 	}
 
-	/**
-	 * Checks whether specified mail is marked for deletion or not
-	 * @param mailNum: he number of selected mail
-	 * @return true: if selected mail is marked for deletion, false: otherwise
-	 */
-	private boolean isDeleted(int mailNum) {
-		try {
-			String mailQuety = "Select markedForDeletion from m_Mail where iMailID = "+ mailList.get(mailNum);
-			resultSet = statement.executeQuery(mailQuety);
-			resultSet.next();
-			return !resultSet.getString("markedForDeletion").equals("0"); 
 
-		} catch (SQLException sqlException) {
-			System.err.println("Unable to check whether mail is deleted or not");
-		}
-		return false;
+	/**
+	 * Extracts the messages from the database, and concatenates the sender and message information
+	 * @return concatenated message
+	 */
+	private String stringMessages() {
+		// TODO Auto-generated method stub
+		String message = "";
+		
+		return message;
 	}
 
 	/**
-	 * Deletes all mail marked for deletion from the database
-	 * @return true: if all mails has been successfully deleted, false: otherwise
+	 * Deletes all logged in user messages from the database
+	 * @return true: if all messages have been successfully deleted, false: otherwise
 	 */
-	private boolean deleteMails() {
+	private boolean deleteMessages() {
 		try {
 			String mailQuery = "Delete from m_Mail where iMaildropID = " + loggedUserID + " and markedForDeletion = 1";
 			statement.executeUpdate(mailQuery);
@@ -358,71 +200,5 @@ public class Database implements DatabaseInterface {
 			System.err.println("Mails weren't deleted");
 		}
 		return false;
-	}
-
-	/**
-	 * Gets the size of specified mail in octets
-	 * @param mailNum: the number of selected mail
-	 * @return the size of mail selected in octets
-	 */
-	private int mailSize(int mailNum) {
-		try {
-			String mailQuety = "Select txMailContent from m_Mail where iMailID = "+ mailList.get(mailNum);
-			resultSet = statement.executeQuery(mailQuety);
-			resultSet.next();
-			return resultSet.getString("txMailContent").length(); 
-		} catch (SQLException sqlException) {
-			System.err.println("Unable to check whether mail is delelter or not");
-		}
-		return -1;
-	}
-
-	/**
-	 * Unmarks the specified mail for deletion
-	 * @param mailNum: the number of selected mail
-	 */
-	private void unmarkDelete(int mailNum) {
-		try {
-			String mailQuery = "Update m_Mail set markedForDeletion = 0 where iMailID = "+ mailList.get(mailNum);
-			statement.executeUpdate(mailQuery);
-		} catch (SQLException sqlException) {
-			System.err.println("Unable to unmark for deletion");
-		}
-	}
-
-	/**
-	 * Gets the header content for specified mail content
-	 * @param mailNum: the number of selected mail
-	 * @return multiple lines containing the header of message as String
-	 */
-	private String mailHeader(int mailNum) {
-		try {
-			String mailQuety = "Select txMailContent from m_Mail where iMailID = "+ mailList.get(mailNum);
-			resultSet = statement.executeQuery(mailQuety);
-			resultSet.next();
-			String mailContent = resultSet.getString("txMailContent"); 
-			return mailContent.substring(0, mailContent.indexOf("\n\n"));
-		} catch (SQLException sqlException) {
-			System.err.println("Unable to get mail header");
-		}
-		return null;
-	}
-
-	/**
-	 * Gets the body content for specified mail content
-	 * @param mailNum: the number of selected mail
-	 * @return multiple lines containing the body of message as String
-	 */
-	private String mailBody(int mailNum) {
-		try {
-			String mailQuety = "Select txMailContent from m_Mail where iMailID = "+ mailList.get(mailNum);
-			resultSet = statement.executeQuery(mailQuety);
-			resultSet.next();
-			String mailContent = resultSet.getString("txMailContent"); 
-			return mailContent.substring(mailContent.indexOf("\n\n")+2);
-		} catch (SQLException sqlException) {
-			System.err.println("Unable to get mail body");
-		}
-		return null;
 	}
 }

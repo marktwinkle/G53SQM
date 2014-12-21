@@ -45,13 +45,6 @@ public interface DatabaseInterface {
 	public boolean hail();
 	
 	/**
-	 * Marks selected mail to be deleted once server quits in update state
-	 * @param mailNum: the number of selected mail
-	 * @return true: if mail has been successfully marked for delet, false: otherwise
-	 */
-	public boolean dele(int mailNum);
-	
-	/**
 	 * Lists the messages sent to logged user from other users
 	 * @return a string text of messages
 	 */
