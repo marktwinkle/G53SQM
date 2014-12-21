@@ -31,6 +31,7 @@ public class Client {
 	private BufferedReader clientInputAiman;
 
 	private String test="Mark";
+	private String viab;
 
 	public Client(String hostName, int portNumber, InputStream clientInput, PrintStream clientOutput) {
 		try {
