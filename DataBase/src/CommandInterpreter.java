@@ -5,18 +5,15 @@ public class CommandInterpreter {
 	private final int ARG_ONE = 1;
 	private final int ARG_TWO = 2;
 	private final int ARGUMENT_MAX_LENGTH = 40;
-	//FIXME: are we implementing this , what about mail body?
-	private final int RESPONSE_MAX_LENGTH = 512;
 	private final int AUTHORIZATION = 0;
 	private final int TRANSACTION = 1;
-	private final int UPDATE = 2;
 	private final String OK = "+OK ";
 	private final String ERR = "-ERR ";
 	private final String CRLF = "\r\n";
 	private int  state;
 	private DatabaseInterface database;
 	
-	//initialize state and mock database
+	//Initialise state and mock database
 	public CommandInterpreter() {
 		state = AUTHORIZATION;
 		database = new Database();
@@ -37,9 +34,6 @@ public class CommandInterpreter {
 
 		case TRANSACTION: 
 			return transaction(input);
-
-		case UPDATE: 
-			return update(input);
 
 		default:
 			response = "Invalid state NO."+state;
@@ -62,21 +56,13 @@ public class CommandInterpreter {
 		
 		switch (inputLine [COMMAND]) {
 
-		case "USER":
-			if (database.user(inputLine[ARG_ONE])) {
+		case "IDEN":
+			if (!database.user(inputLine[ARG_ONE]) && validateUserName(inputLine[ARG_ONE])) {
+				state = TRANSACTION;
 				response = "valid mailbox";
 				return OK+response+" "+request+CRLF;
 			}	
 			response = inputLine[ARG_ONE]+" mailbox does not exist";
-			return ERR+response+" "+request+CRLF;
-		
-		case "PASS":
-			if (database.pass(request.substring(request.indexOf(' ')+1, request.length()))) {
-				state = TRANSACTION;
-				response = "welcome to mailbox";
-				return OK+response+" "+request+CRLF;
-			}			
-			response = "incorrect password";
 			return ERR+response+" "+request+CRLF;
 		
 		case "QUIT":
@@ -96,7 +82,6 @@ public class CommandInterpreter {
 	private String transaction(String request) {
 		String [] inputLine = request.split(" ");
 		String response = "Invalid command";
-		int mailNum;
 		
 		if (!validCommand(request)) {
 			return ERR+response+" "+request+CRLF;
@@ -106,110 +91,39 @@ public class CommandInterpreter {
 
 		case "STAT":
 		response = database.stat();
+		//TODO: Status message should say how many users are currently logged in and your current session status (logged in / not logged in) and if logged in number of messages sent. 
 			return OK+response+CRLF;
 		
 		case "LIST":
-			if (database.getTotalMailsNumber() != 0) {
-				if (inputLine.length-1 == COMMAND) {
-					response = database.list();
-					return OK+response+CRLF;	
-				}
-				mailNum = Integer.parseInt(inputLine[ARG_ONE]);
-				if (database.exists(mailNum-1)) {
-					response = database.list(mailNum-1);
-					return OK+response+CRLF;
-				}
-			}
-			response = "no such message, only "+database.getTotalMailsNumber()+" messages in maildrop";
-			return ERR+response+" "+request+CRLF;
-		
-		case "RETR":
-			mailNum = Integer.parseInt(inputLine[ARG_ONE]);
-			if (database.exists(mailNum-1)) {
-				response = database.retr(mailNum-1);
-				return OK+response+" "+request+CRLF;
-			}
-			response = "no such message, only "+database.getTotalMailsNumber()+" messages in maildrop";
-			return ERR+response+" "+request+CRLF;
-		
-		case "DELE":
-			mailNum = Integer.parseInt(inputLine[ARG_ONE]);
+			response = database.list();
+			return OK+response+CRLF;	
 			
-			if (database.exists(mailNum-1)) {
-				database.dele(mailNum-1);
-				response = "Message "+mailNum+" deleted";
-				return OK+response+" "+request+CRLF;
-			}
-			response = "no such message, only "+database.getTotalMailsNumber()+" messages in maildrop";
-			return ERR+response+" "+request+CRLF;
-		
-		case "NOOP":
-			response = "";
-			return OK+response+" "+request+CRLF;
-		
-		case "RSET":
-			database.rset();
-			response = "maildrop has "+database.getTotalMailsNumber()+" messages ("+database.getTotalMailsSize()+" octets)";
-			return OK+response+" "+request+CRLF;
-		
-		case "TOP":
-			if (Integer.parseInt(inputLine[ARG_TWO]) < 0) {
-				return ERR+response+" "+request+CRLF;
-			}
-			mailNum = Integer.parseInt(inputLine[ARG_ONE]);
-			int lines = Integer.parseInt(inputLine[ARG_TWO]);
-			if (database.exists(mailNum-1)) {
-				response = database.top(mailNum-1, lines);
-				return OK+response+" "+request+CRLF;	
-			}
-			response = "no such message";
-			return ERR+response+" "+request+CRLF;
-		
-		case "UIDL":
-			if (database.getTotalMailsNumber() != 0){
-				if (inputLine.length-1 == COMMAND) {
-					response = database.uidl();
-					return OK+response+CRLF;
-				} 
-				mailNum = Integer.parseInt(inputLine[ARG_ONE]);
-				response = database.uidl(mailNum-1);
+		case "MESG":
+			if (database.user(inputLine[ARG_ONE])) { //TODO: add condition (&& database.userStatus(username))
+				//TODO: send him a message (implement send in database), response is a confirmation message
+				String message = "";
+				
+				for (int i = ARG_ONE ; i < inputLine.length ; i++) {
+					message += inputLine[i]+" ";
+				}
 				return OK+response+CRLF;
 			}
-			response = "no such message, only "+database.getTotalMailsNumber()+" messages in maildrop";
 			return ERR+response+" "+request+CRLF;
-		
-		case "QUIT":
-			state = UPDATE;
-			return "";
-		
-		default: 
-			return ERR+response+" "+request+CRLF;
-		}
-	}
 
-	/**
-	 * update state commands
-	 * @param request
-	 * @return response
-	 */
-	private String update(String request) {
-		String [] inputLine = request.split(" ");
-		String response = "Invalid command";
-		
-		if (!validCommand(request)) {
-			return ERR+response+" "+request+CRLF;
-		} 
-		
-		switch (inputLine [COMMAND]) {
-		
+		case "HAIL":
+			//TODO: send message to everybody
+			String message = "";
+			
+			for (int i = ARG_ONE ; i < inputLine.length ; i++) {
+				message += inputLine[i]+" ";
+			}
+			return OK+response+CRLF;
+			
 		case "QUIT":
 			if (database.quit()) {
 				response = "Quitting";
 				return OK+response+" "+request+CRLF;
-			}
-			response = "some deleted messages not removed";
-			return ERR+response+" "+request+CRLF;
-		
+			}	
 		default: 
 			return ERR+response+" "+request+CRLF;
 		}
@@ -227,50 +141,41 @@ public class CommandInterpreter {
 
 		// commands with no arguments
 		case "STAT":
-		case "NOOP":
-		case "RSET":
 		case "QUIT":
+		case "LIST":
 			if (inputLine.length-1 == COMMAND) {
 				return true;
 			}
 			return false;
 
 		// commands with one argument
-		case "USER":
-		case "RETR":
-		case "DELE":
+		case "IDEN":
+		case "HAIL":
 			if (inputLine.length-1 == ARG_ONE && inputLine[ARG_ONE].length() <= ARGUMENT_MAX_LENGTH) {
 				return true;
 			}
 			return false;
 
 		// commands with two arguments
-		case "TOP":
+		case "MESG":
 			if (inputLine.length-1 == ARG_TWO && inputLine[ARG_ONE].length() <= ARGUMENT_MAX_LENGTH && inputLine[ARG_TWO].length() <= ARGUMENT_MAX_LENGTH) {
 				return true;
 			}
 			return false;
 
-		// commands with optional arguments
-		case "UIDL":
-		case "LIST":
-			if (inputLine.length-1 == COMMAND) {
-				return true;
-			}
-			if (inputLine.length-1 == ARG_ONE && inputLine[ARG_ONE].length() <= ARGUMENT_MAX_LENGTH) {
-				return true;
-			}
-			return false;
-			
-		// commands with one or more arguments (Password with spaces)
-		case "PASS":
-			if (inputLine.length-1 >= ARG_ONE && request.substring(request.indexOf(' ')+1).length() <= ARGUMENT_MAX_LENGTH) {
-				return true;
-			}
-			return false;
 		default: 
 			return false; 
 		}
+	}
+	
+	/**
+	 * Checks user name for illegal characters
+	 * @param username: user-input user name
+	 * @return True: no invalid characters, False: invalid characters are inputed
+	 */
+	private boolean validateUserName(String username) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	public DatabaseInterface getDatabase() {
