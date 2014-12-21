@@ -26,7 +26,7 @@ public class Client {
 	private BufferedReader clientInput;
 	private BufferedReader clientInputMark;
 	private BufferedReader clientInputAiman;
-	private boolean test;
+	private String test="Aiman";
 
 	public Client(String hostName, int portNumber, InputStream clientInput, PrintStream clientOutput) {
 		try {
