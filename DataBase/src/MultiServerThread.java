@@ -81,7 +81,6 @@ public class MultiServerThread extends Thread {
 		try {
 			input.close();
 			output.close();
-			cmd.getDatabase().releaseLock(cmd.getDatabase().getLoggedUserId());
 			connectionSocket.close();
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
