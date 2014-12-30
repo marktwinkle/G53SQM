@@ -3,11 +3,11 @@
 public interface DatabaseInterface {
 
 	/**
-	 * Verify if user exists in database
+	 * logs user into the database
 	 * @param user: user name
-	 * @return true: if user exists, false: if no such user
+	 * @return true: if able to log in, false: if log in is invalid
 	 */
-	public boolean user(String user);
+	public boolean iden(String user);
 
 	/**
 	 * Allows logged in client to end current session, and removes user from active users list
