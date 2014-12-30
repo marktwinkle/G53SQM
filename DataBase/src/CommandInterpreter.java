@@ -4,7 +4,7 @@ public class CommandInterpreter {
 	private final int COMMAND = 0;
 	private final int ARG_ONE = 1;
 	private final int ARG_TWO = 2;
-	private final int ARGUMENT_MAX_LENGTH = 40;
+	private final int ARGUMENT_MAX_LENGTH = 255;
 	private final int AUTHORIZATION = 0;
 	private final int TRANSACTION = 1;
 	private final String OK = "+OK ";
@@ -57,12 +57,12 @@ public class CommandInterpreter {
 		switch (inputLine [COMMAND]) {
 
 		case "IDEN":
-			if (!database.user(inputLine[ARG_ONE]) && validateUserName(inputLine[ARG_ONE])) {
+			if (database.iden(inputLine[ARG_ONE]) && validateUserName(inputLine[ARG_ONE])) {
 				state = TRANSACTION;
-				response = "valid mailbox";
+				response = "valid username";
 				return OK+response+" "+request+CRLF;
 			}	
-			response = inputLine[ARG_ONE]+" mailbox does not exist";
+			response = inputLine[ARG_ONE]+" invalid username";
 			return ERR+response+" "+request+CRLF;
 		
 		case "QUIT":
@@ -99,7 +99,7 @@ public class CommandInterpreter {
 			return OK+response+CRLF;	
 			
 		case "MESG":
-			if (database.user(inputLine[ARG_ONE])) { //TODO: add condition (&& database.userStatus(username))
+			if (database.iden(inputLine[ARG_ONE])) { //TODO: add condition (&& database.idenStatus(username))
 				//TODO: send him a message (implement send in database), response is a confirmation message
 				String message = "";
 				
@@ -175,7 +175,7 @@ public class CommandInterpreter {
 	 */
 	private boolean validateUserName(String username) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 	
 	public DatabaseInterface getDatabase() {
