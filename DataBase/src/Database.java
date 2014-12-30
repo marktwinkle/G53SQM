@@ -37,7 +37,7 @@ import java.util.List;
 
 public class Database implements DatabaseInterface {
 
-	
+
 	private final String TERMINATION_OCTET = ".";
 	private final String CRLF = "\r\n";
 	private final int INVALID_USER_ID = -1;
@@ -47,34 +47,38 @@ public class Database implements DatabaseInterface {
 
 	private List <Integer> messagesList;
 	private int loggedUserID;
-	
+
 	private boolean testBool;
 	private int testInt;
 
 	public Database() {
 		loggedUserID = INVALID_USER_ID;
 		messagesList = new ArrayList <Integer> ();
-		//establishDatabaseConnection();
+		establishDatabaseConnection();
 		testBool = true;
 		testInt = 5;
 	}
-	
+
 
 	@Override
-	public boolean user(String username) {
-		/*try {
-			loggedUserID = INVALID_USER_ID;
-
-			String mailQuety = "Select vchUsername, iMaildropID from m_Maildrop where vchUsername = \""+ username+"\"";
-			resultSet = statement.executeQuery(mailQuety);
-			resultSet.next();
-			loggedUserID = Integer.parseInt(resultSet.getString("iMaildropID"));
-			return true;
-
+	public boolean iden(String username) {
+		try {
+			//check if user name exists
+			String chatQuery = "Select UserName, UserID from User where lower(UserName) = \""+username.toLowerCase()+"\"";
+			resultSet = statement.executeQuery(chatQuery);
+			if (resultSet.next()) {
+				return false;
+			}
+			
+			//add user name to database
+			chatQuery = "Insert into User Values (NULL, \""+username+"\")";
+			statement.executeUpdate(chatQuery);
+			
+			//TODO: set logged user id
 		} catch (SQLException sqlException) {
-			System.err.println("Unable to load Maildrop");
-		}*/
-		return testBool;
+			sqlException.printStackTrace();
+		} 
+		return true;
 	}
 
 	@Override
@@ -110,9 +114,16 @@ public class Database implements DatabaseInterface {
 
 	@Override
 	public boolean mesg(String destinationUser, String messageText) {
-		// TODO Auto-generated method stub
-		return false;
+		String mailQuety = "Insert into DirectMessages Values (NULL, \""+loggedUserID+"\", \""+destinationUser+"\", \""+messageText+"\")"; 
+		try {
+			resultSet = statement.executeQuery(mailQuety);
+		} catch (SQLException e) {
+			System.err.println("Unable to message user");
+			return false;
+		}
+		return true;
 	}
+
 
 	@Override
 	public boolean hail() {
@@ -128,9 +139,10 @@ public class Database implements DatabaseInterface {
 		deleteMessages();
 		return messages;
 	}
-	
 
-	
+
+
+
 
 	//start of private methods ------------------------------------------------------------
 
@@ -144,12 +156,13 @@ public class Database implements DatabaseInterface {
 			//TODO: change to university database
 			Class.forName("com.mysql.jdbc.Driver");
 			// Establishes connection to database by obtaining a Connection object
-			databaseConnection = DriverManager.getConnection("jdbc:mysql://mysql.cs.nott.ac.uk", "amb12u", "monday");
+			databaseConnection = DriverManager.getConnection("jdbc:mysql://54.84.79.252:3306/sql562752", "sql562752", "pK6%aB7%");
 			// Creates a Statement object for sending SQL statements to the database
 			statement = databaseConnection.createStatement();
 			return true;
 		} catch (ClassNotFoundException classNotFoundException) {
 			System.err.println("Problem loading driver class");
+			classNotFoundException.printStackTrace();
 		} catch (SQLException sqlException) {
 			System.err.println("Problem connecting to Database");
 		}
@@ -183,7 +196,7 @@ public class Database implements DatabaseInterface {
 	private String stringMessages() {
 		// TODO Auto-generated method stub
 		String message = "";
-		
+
 		return message;
 	}
 
