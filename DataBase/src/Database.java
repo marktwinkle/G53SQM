@@ -36,10 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Database implements DatabaseInterface {
-
-
-	private final String TERMINATION_OCTET = ".";
-	private final String CRLF = "\r\n";
+	
 	private final int INVALID_USER_ID = -1;
 	private Connection databaseConnection;
 	private Statement statement;
@@ -48,15 +45,10 @@ public class Database implements DatabaseInterface {
 	private List <Integer> messagesList;
 	private int loggedUserID;
 
-	private boolean testBool;
-	private int testInt;
-
 	public Database() {
 		loggedUserID = INVALID_USER_ID;
 		messagesList = new ArrayList <Integer> ();
 		establishDatabaseConnection();
-		testBool = true;
-		testInt = 5;
 	}
 
 
@@ -82,8 +74,8 @@ public class Database implements DatabaseInterface {
 
 	@Override
 	public boolean quit() {
-		// delete user from database
-		String chatQuery = "Delete from User where UserID = "+loggedUserID;
+		// update user status to offline
+		String chatQuery = "Update User Set Status = 0 Where UserID = "+loggedUserID;
 		try {
 			statement.executeUpdate(chatQuery);
 			return true;
