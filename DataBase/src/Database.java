@@ -69,36 +69,52 @@ public class Database implements DatabaseInterface {
 			if (resultSet.next()) {
 				return false;
 			}
-			
+
 			//add user name to database
 			chatQuery = "Insert into User Values (NULL, \""+username+"\")";
-			statement.executeUpdate(chatQuery);
-			
-			//TODO: set logged user id
+			statement.executeUpdate(chatQuery);	
+
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
 		} 
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean quit() {
-		/*return deleteMails() && releaseLock(loggedUserID);*/
-		return testBool;
+		// delete user from database
+		String chatQuery = "Delete from User where UserID = "+loggedUserID;
+		try {
+			statement.executeUpdate(chatQuery);
+			return true;
+		} catch (SQLException e) {
+			System.err.println("Unable to logout");
+		}
+		return false;
 	}
 
 	@Override
 	public String list() {
-		String response = "";		
-		/*response = getTotalMailsNumber() +" messages ("+getTotalMailsSize()+" octets)"+CRLF;
-
-		for (int i = 0 ; i < mailList.size() ; i++) {
-			if (!isDeleted(i)){
-				response += (i+1)+" "+ mailSize(i)+CRLF;
+		String list = "";
+		int ctr = 1;
+		
+		String chatQuery = "Select * from User";
+		try {
+			resultSet = statement.executeQuery(chatQuery);
+			list = " # \tUser Name\t# Messgaes\tStatus\n";
+			while (resultSet.next()) {
+				list += "("+ctr+")\t"+resultSet.getString("Username")+"\t"+resultSet.getString("NumMsg")+"\t";
+				if (resultSet.getBoolean("Status")) {
+					list += "Online\n";
+				} else {
+					list += "Offline\n";
+				}
+				ctr++;
 			}
+		} catch (SQLException sqlException) {
+			sqlException.printStackTrace();
 		}
-		response += TERMINATION_OCTET;*/
-		return response;
+		return list;
 	}
 
 	@Override
@@ -108,8 +124,21 @@ public class Database implements DatabaseInterface {
 
 	@Override
 	public String stat() {
-		// TODO Auto-generated method stub
-		return null;
+		String stats = "";
+		int ctr = 1;
+		
+		String chatQuery = "Select UserName from User";
+		try {
+			resultSet = statement.executeQuery(chatQuery);
+			stats = " # \tUser Name\n";
+			while (resultSet.next()) {
+				stats += "("+ctr+")\t"+resultSet.getString("Username")+"\n";
+				ctr++;
+			}
+		} catch (SQLException sqlException) {
+			sqlException.printStackTrace();
+		}
+		return stats;
 	}
 
 	@Override
