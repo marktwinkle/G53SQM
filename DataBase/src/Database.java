@@ -103,7 +103,7 @@ public class Database implements DatabaseInterface {
 			resultSet = statement.executeQuery(chatQuery);
 			list = " # \tUser Name\t# Messgaes\tStatus\n";
 			while (resultSet.next()) {
-				list += "("+ctr+")\t"+resultSet.getString("Username")+"\t"+resultSet.getString("NumMsg")+"\t";
+				list += "\t("+ctr+")\t"+resultSet.getString("Username")+"\t"+resultSet.getString("NumMsg")+"\t";
 				if (resultSet.getBoolean("Status")) {
 					list += "Online\n";
 				} else {
@@ -130,9 +130,9 @@ public class Database implements DatabaseInterface {
 		String chatQuery = "Select UserName from User";
 		try {
 			resultSet = statement.executeQuery(chatQuery);
-			stats = " # \tUser Name\n";
+			stats = "# \tUser Name\n";
 			while (resultSet.next()) {
-				stats += "("+ctr+")\t"+resultSet.getString("Username")+"\n";
+				stats += "\t("+ctr+")\t"+resultSet.getString("Username")+"\n";
 				ctr++;
 			}
 		} catch (SQLException sqlException) {
