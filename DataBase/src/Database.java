@@ -43,7 +43,7 @@ public class Database implements DatabaseInterface {
 	private int loggedUserID;
 
 	public Database() {
-		loggedUserID = 1;
+		loggedUserID = INVALID_USER_ID;
 		establishDatabaseConnection();
 	}
 
@@ -59,8 +59,14 @@ public class Database implements DatabaseInterface {
 			}
 
 			//add user name to database
-			chatQuery = "Insert into User Values (NULL, \""+username+"\")";
+			chatQuery = "Insert into User Values (NULL, \""+username+"\", 1, 0)";
 			statement.executeUpdate(chatQuery);	
+			
+			chatQuery = "Select UserID from User where lower(UserName) = \""+username.toLowerCase()+"\"";
+			resultSet = statement.executeQuery(chatQuery);
+			resultSet.next();
+			loggedUserID = resultSet.getInt("UserID");
+			return true;
 
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
@@ -71,7 +77,7 @@ public class Database implements DatabaseInterface {
 	@Override
 	public boolean quit() {
 		// update user status to offline
-		String chatQuery = "Update User Set Status = 0 Where UserID = "+loggedUserID;
+		String chatQuery = "Update User Set Stat = 0 Where UserID = "+loggedUserID;
 		try {
 			statement.executeUpdate(chatQuery);
 			return true;
@@ -131,19 +137,15 @@ public class Database implements DatabaseInterface {
 
 	@Override
 	public boolean mesg(String destinationUser, String messageText) {
-		if (isOnline(destinationUser)) {
-			int destID = getUserID(destinationUser);
-			String mailQuety = "Insert into DirectMessages Values (NULL, \""+loggedUserID+"\", \""+destID+"\", \""+messageText+"\")"; 
-			try {
-				statement.executeUpdate(mailQuety);
-			} catch (SQLException e) {
-				System.err.println("Unable to message user");
-				return false;
-			}
-			return true;
+		int destID = getUserID(destinationUser);
+		String mailQuety = "Insert into DirectMessages Values (NULL, \""+loggedUserID+"\", \""+destID+"\", \""+messageText+"\")"; 
+		try {
+			statement.executeUpdate(mailQuety);
+		} catch (SQLException e) {
+			System.err.println("Unable to message user");
+			return false;
 		}
-		//user is offline
-		return false;
+		return true;
 	}
 
 	@Override
@@ -237,7 +239,7 @@ public class Database implements DatabaseInterface {
 		}
 		return false;
 	}
-	
+
 	private int getUserID(String username) {
 		String chatQuery = "Select UserID from User where Username ="+username;
 		try {
