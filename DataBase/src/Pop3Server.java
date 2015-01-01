@@ -33,6 +33,7 @@ public class Pop3Server {
 
 			// open server socket and wait for client connections
 			try (ServerSocket serverSocket = new ServerSocket(portNumber)) { 
+				System.out.println("Server running on port "+portNumber);
 				while (listening) {
 					MultiServerThread server = new MultiServerThread(serverSocket.accept(), timeout);
 					server.start();
