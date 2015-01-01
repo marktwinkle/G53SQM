@@ -9,6 +9,8 @@ public class MultiServerThread extends Thread {
 
 	private final String OK = "+OK ";
 	private final String WELCOMING_MESSAGE = "POP3 server ready";
+	private final String CLIENT_TERMINATED_MESSAGE = "Connection Terminated by Client";
+	private final String SERVER_TIMEOUT_MESSAGE = "Server timeout expired";
 	private final boolean AUTO_FLUSH = true;
 	private String request, response;
 	private int timeout;
@@ -37,7 +39,7 @@ public class MultiServerThread extends Thread {
 			connectionSocket.setSoTimeout(timeout);
 			interaction();
 		} catch (SocketException socketExpcetion) {
-			System.err.println("Server timeout expired");
+			System.err.println(SERVER_TIMEOUT_MESSAGE);
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		} finally {
@@ -60,15 +62,15 @@ public class MultiServerThread extends Thread {
 	 */
 	private void interaction() throws IOException {
 		response = OK+WELCOMING_MESSAGE;
-		while (running) {
+		output.println(response);
+		while ((request = input.readLine()) != null) {
 			try {	
-				output.println(response);					//response is sent back to Client
-				request = input.readLine();					//takes in request from client
 				response = cmd.handleInput(request);		//sends request to CommandInterpreter
+				output.println(response);					//response is sent back to Client
 															//CommandInterpreter asks Database for data, and Database responses											
 															//CommandInterpreter use Database response to generate 'response', and send it back to Server
 			} catch (NullPointerException nullPointerException) {
-				System.err.println("Connection Terminated by Client");
+				System.err.println(CLIENT_TERMINATED_MESSAGE);
 				running = false;
 			}
 		}
@@ -87,8 +89,4 @@ public class MultiServerThread extends Thread {
 		}
 
 	}
-
-	/**
-	 *  handling the timeout
-	 */
 }
