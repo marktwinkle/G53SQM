@@ -68,19 +68,13 @@ public class Client {
 		while (running) {
 			request = clientInput.readLine();				
 			response = handleRequest(request);
+			clientOutput.print(response);
 
-			if (response != (null)) {
-				clientOutput.print(response);
-				
-				//handling terminating cases
-				if ((request.equals(CLIENT_REQUEST_QUIT) && (response.split(" ")[0].equals(OK.trim()) || response.split(" ")[0].equals(ERR.trim())))) {
-					running = false;
-				}
-			//handling server timeout
-			} else {
-				System.err.println(LOST_CONNECTION_MESSAGE);
+			//handling terminating cases
+			if (request.equals(CLIENT_REQUEST_QUIT)) {
 				running = false;
 			}
+
 		}
 	}
 
@@ -125,7 +119,7 @@ public class Client {
 	 */
 	private String handleRequest(String request) {
 		serverOutput.println(request);
-		
+
 		try {
 			String serverResponse = "";
 			Thread.sleep(250);
@@ -135,13 +129,13 @@ public class Client {
 				}
 				return serverResponse;
 			}
-			
+
 		} catch (IOException ioException) {
-			
+
 		} catch (InterruptedException interruptedException) {
-			
+
 		}
 		return null;
 	}
-	
+
 }
