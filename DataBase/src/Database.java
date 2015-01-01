@@ -32,22 +32,18 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Database implements DatabaseInterface {
-	
+
 	private final int INVALID_USER_ID = -1;
 	private Connection databaseConnection;
 	private Statement statement;
 	private ResultSet resultSet;
 
-	private List <Integer> messagesList;
 	private int loggedUserID;
 
 	public Database() {
-		loggedUserID = INVALID_USER_ID;
-		messagesList = new ArrayList <Integer> ();
+		loggedUserID = 1;
 		establishDatabaseConnection();
 	}
 
@@ -89,17 +85,17 @@ public class Database implements DatabaseInterface {
 	public String list() {
 		String list = "";
 		int ctr = 1;
-		
+
 		String chatQuery = "Select * from User";
 		try {
 			resultSet = statement.executeQuery(chatQuery);
-			list = " # \tUser Name\t# Messgaes\tStatus\n";
+			list = "\n# \tUser Name\t# Messgaes\tStatus";
 			while (resultSet.next()) {
-				list += "\t("+ctr+")\t"+resultSet.getString("Username")+"\t"+resultSet.getString("NumMsg")+"\t";
-				if (resultSet.getBoolean("Status")) {
-					list += "Online\n";
+				list += "\n("+ctr+")\t"+resultSet.getString("Username")+"\t\t"+resultSet.getString("NumMsg")+"\t\t";
+				if (resultSet.getBoolean("Stat")) {
+					list += "Online";
 				} else {
-					list += "Offline\n";
+					list += "Offline";
 				}
 				ctr++;
 			}
@@ -118,13 +114,13 @@ public class Database implements DatabaseInterface {
 	public String stat() {
 		String stats = "";
 		int ctr = 1;
-		
-		String chatQuery = "Select UserName from User";
+
+		String chatQuery = "Select UserName from User Where Stat = 1";
 		try {
 			resultSet = statement.executeQuery(chatQuery);
-			stats = "# \tUser Name\n";
+			stats = "\n#\tUser Name\n";
 			while (resultSet.next()) {
-				stats += "\t("+ctr+")\t"+resultSet.getString("Username")+"\n";
+				stats += "("+ctr+")\t"+resultSet.getString("Username")+"\n";
 				ctr++;
 			}
 		} catch (SQLException sqlException) {
@@ -135,16 +131,20 @@ public class Database implements DatabaseInterface {
 
 	@Override
 	public boolean mesg(String destinationUser, String messageText) {
-		String mailQuety = "Insert into DirectMessages Values (NULL, \""+loggedUserID+"\", \""+destinationUser+"\", \""+messageText+"\")"; 
-		try {
-			resultSet = statement.executeQuery(mailQuety);
-		} catch (SQLException e) {
-			System.err.println("Unable to message user");
-			return false;
+		if (isOnline(destinationUser)) {
+			int destID = getUserID(destinationUser);
+			String mailQuety = "Insert into DirectMessages Values (NULL, \""+loggedUserID+"\", \""+destID+"\", \""+messageText+"\")"; 
+			try {
+				statement.executeUpdate(mailQuety);
+			} catch (SQLException e) {
+				System.err.println("Unable to message user");
+				return false;
+			}
+			return true;
 		}
-		return true;
+		//user is offline
+		return false;
 	}
-
 
 	@Override
 	public boolean hail() {
@@ -155,8 +155,7 @@ public class Database implements DatabaseInterface {
 	@Override
 	public String myMsgs() {
 		String messages = "";
-		loadMessages();
-		messages = stringMessages();
+		messages = loadMessages();
 		deleteMessages();
 		return messages;
 	}
@@ -191,34 +190,26 @@ public class Database implements DatabaseInterface {
 	}
 
 	/**
-	 * Loads the IDs of messages corresponding to specified user into a list
-	 * @return true: if successfully loaded message IDs into the list, false: otherwise
+	 * Loads the messages corresponding to specified user into a string
+	 * @return a string of all messages sent to user, or null of there are no messages
 	 */
-	private boolean loadMessages() {
+	private String loadMessages() {
+		String messages = "";
 		try {
-			messagesList.clear();
-			String mailQuery = "Select iMailID from m_Mail where iMaildropID = "+ loggedUserID;
+			String mailQuery = "SELECT DirectMessages.MessageID, User.Username, DirectMessages.MessageText FROM DirectMessages"
+					+ " INNER JOIN User"
+					+ " ON User.UserID = DirectMessages.SenderID AND DirectMessages.ReceiverID = "+ loggedUserID;
 			resultSet = statement.executeQuery(mailQuery);
 			while(resultSet.next()) {
-				messagesList.add(Integer.parseInt(resultSet.getString("iMailID")));
+				messages += "\nPrivate Message\n"
+						+ "Sender: " + resultSet.getString("User.Username");
+				messages += "\n" + resultSet.getString("DirectMessages.MessageText");
 			}
-			return true;
+			return messages;
 		} catch (SQLException sqlException) {
-			System.err.println("Unable to get mails");
+			System.err.println("Unable to get messages");
 		}
-		return false;
-	}
-
-
-	/**
-	 * Extracts the messages from the database, and concatenates the sender and message information
-	 * @return concatenated message
-	 */
-	private String stringMessages() {
-		// TODO Auto-generated method stub
-		String message = "";
-
-		return message;
+		return null;
 	}
 
 	/**
@@ -227,12 +218,36 @@ public class Database implements DatabaseInterface {
 	 */
 	private boolean deleteMessages() {
 		try {
-			String mailQuery = "Delete from m_Mail where iMaildropID = " + loggedUserID + " and markedForDeletion = 1";
+			String mailQuery = "Delete from DirectMessages where ReceiverID = " + loggedUserID;
 			statement.executeUpdate(mailQuery);
 			return true;
 		} catch (Exception exception) {
-			System.err.println("Mails weren't deleted");
+			System.err.println("Problem deleting messages");
 		}
 		return false;
+	}
+
+	private boolean isOnline(String destinationUser) {
+		String chatQuery = "Select Username from User where Username ="+destinationUser+" and Status = 1";
+		try {
+			resultSet = statement.executeQuery(chatQuery);
+			return resultSet.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	private int getUserID(String username) {
+		String chatQuery = "Select UserID from User where Username ="+username;
+		try {
+			resultSet = statement.executeQuery(chatQuery);
+			if(resultSet.next()) {
+				return resultSet.getInt("UserID");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return -1;
 	}
 }
