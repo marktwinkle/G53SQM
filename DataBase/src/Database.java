@@ -40,7 +40,7 @@ public class Database implements DatabaseInterface {
 	private Statement statement;
 	private ResultSet resultSet;
 
-	private int loggedUserID;
+	private int loggedUserID, msgCount;
 
 	public Database() {
 		loggedUserID = INVALID_USER_ID;
@@ -62,10 +62,11 @@ public class Database implements DatabaseInterface {
 			chatQuery = "Insert into User Values (NULL, \""+username+"\", 1, 0)";
 			statement.executeUpdate(chatQuery);	
 			
-			chatQuery = "Select UserID from User where lower(UserName) = \""+username.toLowerCase()+"\"";
+			chatQuery = "Select UserID, NumMsg from User where lower(UserName) = \""+username.toLowerCase()+"\"";
 			resultSet = statement.executeQuery(chatQuery);
 			resultSet.next();
 			loggedUserID = resultSet.getInt("UserID");
+			msgCount = resultSet.getInt("NumMsg");
 			return true;
 
 		} catch (SQLException sqlException) {
@@ -137,10 +138,14 @@ public class Database implements DatabaseInterface {
 
 	@Override
 	public boolean mesg(String destinationUser, String messageText) {
-		int destID = getUserID(destinationUser);
-		String mailQuety = "Insert into DirectMessages Values (NULL, \""+loggedUserID+"\", \""+destID+"\", \""+messageText+"\")"; 
+		int destID = getUserID(destinationUser); 
 		try {
-			statement.executeUpdate(mailQuety);
+			String chatQuery = "Insert into DirectMessages Values (NULL, \""+loggedUserID+"\", \""+destID+"\", \""+messageText+"\")";
+			statement.executeUpdate(chatQuery);
+			
+			msgCount++;
+			chatQuery = "Update User set NumMsg = "+msgCount+" Where UserID = "+loggedUserID;
+			statement.executeUpdate(chatQuery);
 		} catch (SQLException e) {
 			System.err.println("Unable to message user");
 			return false;
@@ -162,7 +167,19 @@ public class Database implements DatabaseInterface {
 		return messages;
 	}
 
-
+	@Override
+	public int getUserID(String username) {
+		String chatQuery = "Select UserID from User where lower(Username) = \""+username.toLowerCase()+"\"";
+		try {
+			resultSet = statement.executeQuery(chatQuery);
+			if(resultSet.next()) {
+				return resultSet.getInt("UserID");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
 
 
 
@@ -238,18 +255,5 @@ public class Database implements DatabaseInterface {
 			e.printStackTrace();
 		}
 		return false;
-	}
-
-	private int getUserID(String username) {
-		String chatQuery = "Select UserID from User where Username ="+username;
-		try {
-			resultSet = statement.executeQuery(chatQuery);
-			if(resultSet.next()) {
-				return resultSet.getInt("UserID");
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return -1;
 	}
 }

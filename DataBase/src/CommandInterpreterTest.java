@@ -21,7 +21,7 @@ public class CommandInterpreterTest {
 	final String ERR = "-ERR ";
 	private final String CRLF = "\r\n";
 	
-	CommandInterpreter command = new CommandInterpreter();
+	CommandInterpreterOLD command = new CommandInterpreterOLD();
 
 	@Test
 	public void testInvalidCommand1() {
@@ -44,24 +44,25 @@ public class CommandInterpreterTest {
 	
 	@Test
 	public void testCommandInvalidArguemtns3() {
-		String input = "USER " +
-				"0123456789" +
-				"0123456789" +
-				"0123456789" +
-				"0123456789" +
-				"0";
+		String input = "IDEN " +
+				"0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" +
+				"0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" +
+				"0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" +
+				"0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" +
+				"0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" +
+				"012345";
 		assertTrue(!command.isValidArgs(input));
 	}
 
 	@Test
 	public void testUserOk() {
-		String input = "USER alex";
+		String input = "IDEN Aiman";
 		assertTrue(command.handleInput(input).equals(OK+"valid mailbox"+" "+input+CRLF));
 	}
 
 	@Test
 	public void testUserErr() {
-		String input = "USER hello";
+		String input = "IDEN hello";
 		String inputline [] = input.split(" ");
 		assertTrue(command.handleInput(input).equals(ERR+inputline[ARGUMENT_ONE]+" mailbox does not exist"+" "+input+CRLF));
 	}
@@ -70,33 +71,29 @@ public class CommandInterpreterTest {
 	
 	@Test
 	public void testStatOk() {
-		String input = "USER alex";
+		String input = "IDEN alex";
 		command.handleInput(input);
 		input = "PASS hello123";
 		command.handleInput(input);
 		input = "STAT";
 		assertTrue(command.handleInput(input).split(" ")[0].equals(OK.trim()));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
 	}
 
 	@Test
 	public void testListOk1() {
-		String input = "USER alex";
+		String input = "IDEN alex";
 		command.handleInput(input);
 		input = "PASS hello123";
 		command.handleInput(input);
 		input = "LIST";
 		assertTrue(command.handleInput(input).split(" ")[0].equals(OK.trim()));
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
 	}
 
 
 
 	@Test
 	public void testQuitOk() {
-		String input = "USER alex";
+		String input = "IDEN alex";
 		command.handleInput(input);
 		input = "PASS hello123";
 		command.handleInput(input);
@@ -113,22 +110,18 @@ public class CommandInterpreterTest {
 
 	@Test
 	public void testStateChange1() {
-		String input = "USER alex";
+		String input = "IDEN alex";
 		command.handleInput(input);
 		assertTrue(command.getState() == TRANSACTION);
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
 	}
 
 	@Test
 	public void testStateChange2() {
-		String input = "USER alex";
+		String input = "IDEN alex";
 		command.handleInput(input);
 		input = "QUIT";
 		command.handleInput(input);
 		assertTrue(command.getState() == UPDATE);
-		int userId = command.getDatabase().getLoggedUserId();
-		command.getDatabase().releaseLock(userId);
 	}
 
 }

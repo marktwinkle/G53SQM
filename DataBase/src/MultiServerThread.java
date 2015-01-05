@@ -18,14 +18,14 @@ public class MultiServerThread extends Thread {
 	private Socket connectionSocket;
 	private PrintWriter output;
 	private BufferedReader input; 
-	private CommandInterpreter cmd;
+	private CommandInterpreterOLD cmd;
 
 	public MultiServerThread(Socket socket, int timeout) {
 		this.connectionSocket = socket;
 		this.timeout = timeout;
 
 		running = true;
-		cmd = new CommandInterpreter();
+		cmd = new CommandInterpreterOLD();
 		try {
 			setupStreams();
 		} catch (IOException ioException) {

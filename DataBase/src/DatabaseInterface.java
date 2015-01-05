@@ -56,4 +56,6 @@ public interface DatabaseInterface {
 	 */
 	public int getLoggedUserId();
 	
+	public int getUserID(String username);
+	
 }
