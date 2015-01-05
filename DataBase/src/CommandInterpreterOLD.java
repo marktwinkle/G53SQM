@@ -1,5 +1,5 @@
 
-public class CommandInterpreter {
+public class CommandInterpreterOLD {
 
 	private final int COMMAND = 0;
 	private final int ARG_ONE = 1;
@@ -11,12 +11,12 @@ public class CommandInterpreter {
 	private final String ERR = "-ERR ";
 	private final String CRLF = "\r\n";
 	private int  state;
-	private Server server;
+	private DatabaseInterface database;
 	
 	//Initialise state and mock database
-	public CommandInterpreter(Server server) {
-		this.server = server;
+	public CommandInterpreterOLD() {
 		state = AUTHORIZATION;
+		database = new Database();
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class CommandInterpreter {
 		switch (inputLine [COMMAND]) {
 
 		case "IDEN":
-			if (validateUserName(inputLine[ARG_ONE])) {
+			if (database.iden(inputLine[ARG_ONE]) && validateUserName(inputLine[ARG_ONE])) {
 				state = TRANSACTION;
 				response = "valid username";
 				return OK+response+" "+request+CRLF;
@@ -90,14 +90,16 @@ public class CommandInterpreter {
 		switch (inputLine [COMMAND]) {
 
 		case "STAT":
+		response = database.stat();
 		//TODO: Status message should say how many users are currently logged in and your current session status (logged in / not logged in) and if logged in number of messages sent. 
 			return OK+response+CRLF;
 		
 		case "LIST":
+			response = database.list();
 			return OK+response+CRLF;	
 			
 		case "MESG":
-			if (true) { //TODO: add condition (&& database.idenStatus(username))
+			if (database.getUserID(inputLine[ARG_ONE]) != 1) { //TODO: add condition (&& database.idenStatus(username))
 				//TODO: send him a message (implement send in database), response is a confirmation message
 				String message = "";
 				
@@ -105,6 +107,7 @@ public class CommandInterpreter {
 					message += inputLine[i]+" ";
 				}
 				
+				database.mesg(inputLine[ARG_ONE], message);
 				return OK+response+CRLF;
 			}
 			return ERR+response+" "+request+CRLF;
@@ -119,7 +122,7 @@ public class CommandInterpreter {
 			return OK+response+CRLF;
 			
 		case "QUIT":
-			if (true) {
+			if (database.quit()) {
 				response = "Quitting";
 				return OK+response+" "+request+CRLF;
 			}	
@@ -175,6 +178,14 @@ public class CommandInterpreter {
 	private boolean validateUserName(String username) {
 		// TODO Auto-generated method stub
 		return true;
+	}
+	
+	public DatabaseInterface getDatabase() {
+		return database;
+	}
+	
+	public String getMyMessages() {
+		return database.myMsgs();
 	}
 	
 	// Methods for JUnitTest
