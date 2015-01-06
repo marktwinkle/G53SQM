@@ -1,7 +1,6 @@
 
-public class ClientKeyboardTest {
+public class RunClient {
 	public static void main (String args[] ) {
-		
 		
 		// incorrect number of command line arguments
 		if (args.length != 2) {
@@ -14,7 +13,7 @@ public class ClientKeyboardTest {
 			int portNumber = Integer.parseInt(args[1]);
 			
 			Client client = new Client(hostName, portNumber);
-			client.startRunning();
+			client.runClient();
 		
 		// invalid command line arguments
 		} catch (NumberFormatException numberFormatException) {
