@@ -16,7 +16,11 @@ public class ServerThread extends Thread {
 	private final int TRANSACTION_STATE = 1;
 	private final String OK = "+OK ";
 	private final String ERR = "-ERR ";
-
+	
+	//Error messages
+	private final String ERROR_SETUP_STREAMS = "FAILED TO SETUP INPUT/OUTPUT STREAMS";
+	private final String ERROR_READ_INPUT = "FAILED TO READ INPUT";
+	
 	private Server server;
 	private Socket connectionSocket;
 	private PrintWriter output;
@@ -34,24 +38,10 @@ public class ServerThread extends Thread {
 
 	@Override
 	public void run() {
-		try {
-			setupStreams();
-		} catch (IOException e) {
-			System.err.println("FAILED TO SETUP INPUT/OUTPUT STREAMS");
-			e.printStackTrace();
-		}
 
-		messageToClient("Welcome to the 'PAIR CHAT' application");
-		String request, response;
-		try {
-			while ((request = input.readLine()) != null){
-				response = handleInput(request);
-				output.println(response);
-			}
-		} catch (IOException e) {
-			System.err.println("FAILED TO READ");
-			e.printStackTrace();
-		}
+		setupStreams();
+		interaction();
+		endOfConnection();
 	}
 
 	public boolean isRunning() {
@@ -61,26 +51,70 @@ public class ServerThread extends Thread {
 	public ClientInfo getClient() {
 		return client;
 	}
-	// -------------------- Private Methods --------------------
-
-
-	private void setupStreams() throws IOException {
-		input = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-		output = new PrintWriter(connectionSocket.getOutputStream(), true);
-	}
-
+	
 	public synchronized void messageToClient(String message) {
 		output.println(message);
+	}
+	
+	// -------------------- Private Methods --------------------
+
+	/**
+	 * Initialize ServerThread input and output streams from connection socket
+	 * <b>input</b> reads data coming from the other end of stream to this class
+	 * <b>output</b> writes data to the other end of stream
+	 */
+	private void setupStreams() {
+		try {
+			input = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+			output = new PrintWriter(connectionSocket.getOutputStream(), true);
+		} catch (IOException e) {
+			System.err.println(ERROR_SETUP_STREAMS);
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * start of client/server interaction
+	 * reads requests and forwards them to Server, obtain response from server and then forward it back to client 
+	 * <b>request</b> request from client class
+	 * <b>response</b> the response from server to the client request 
+	 */
+	private void interaction() {
+		messageToClient("Welcome to the 'PAIR CHAT' application");
+		String request, response;
+		try {
+			while ((request = input.readLine()) != null){
+				response = handleInput(request);
+				output.println(response);
+			}
+		} catch (IOException e) {
+			System.err.println(ERROR_READ_INPUT);
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Closes socket and open streams
+	 */
+	private void endOfConnection() {
+		try {
+			connectionSocket.close();
+			input.close();
+			output.close();
+			
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
 	}
 
 	// ------------ Handling Request ---------------------
 
 	/**
-	 * 
-	 * @param input: message from network
-	 * @return response
+	 * Verify the input against the application state
+	 * @param input: message from client
+	 * @return response: output of client request
 	 */
-	public String handleInput(String input) {
+	private String handleInput(String input) {
 
 		String response;
 		switch (state) {
@@ -259,7 +293,7 @@ public class ServerThread extends Thread {
 						(username.charAt(i) >= 'a' && username.charAt(i) <= 'z') || 
 						(username.charAt(i) >= 'A' && username.charAt(i) >= 'Z') ||
 						(username.charAt(i) >= '0' && username.charAt(i) <= '9') 
-					)) {
+						)) {
 					return false;
 				}
 			}
