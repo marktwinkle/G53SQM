@@ -12,18 +12,16 @@ public class Server {
 		this.portNumber = portNumber;
 		connectionsList = new ArrayList<ServerThread>();
 		clientsList = new ArrayList<ClientInfo>();
-
-		runServer();
 	}
 
-	private void runServer() {
-		
+	public void runServer() {
+
 		// open server socket and wait for client connections
 		try (ServerSocket serverSocket = new ServerSocket(portNumber)) { 
 			System.out.println("Server running on port "+portNumber);
 			while(true) {
 				try {
-					
+
 					ServerThread serverThread = new ServerThread(this, serverSocket.accept());
 					connectionsList.add(serverThread);
 					serverThread.start();
@@ -32,26 +30,34 @@ public class Server {
 					e.printStackTrace();
 				}
 			}
-		// when port is busy
+			// when port is busy
 		} catch (IOException ioException) {
 			System.err.println("Could not listen on port " + portNumber);
 			System.exit(-1);
 		}
 	}
 
-	public void addClient(ClientInfo client) {
-		clientsList.add(client);
-		messageToEveryone("<\""+client.getUsername()+"\" has joined the chat>");
+	public boolean addClient(ClientInfo client) {
+		if (client != null) {
+			clientsList.add(client);
+			messageToEveryone("<\""+client.getUsername()+"\" has joined the chat>");
+			return true;
+		}
+		return false;
 	}
 
-	public void removeClient(ClientInfo client) {
-		clientsList.remove(clientsList.indexOf(client));
-		for (ServerThread connection : connectionsList) {
-			if (!connection.isRunning()) {
-				connectionsList.remove(connectionsList.indexOf(connection));
-				messageToEveryone("<\""+client.getUsername()+"\" has left the chat>");
+	public boolean removeClient(ClientInfo client) {
+		if (clientsList.size() > 0) {
+			clientsList.remove(clientsList.indexOf(client));
+			for (ServerThread connection : connectionsList) {
+				if (!connection.isRunning()) {
+					connectionsList.remove(connectionsList.indexOf(connection));
+					messageToEveryone("<\""+client.getUsername()+"\" has left the chat>");
+				}
 			}
+			return true;
 		}
+		return false;
 	}
 
 	public String getUsersList() {
@@ -75,7 +81,7 @@ public class Server {
 	}
 
 	public boolean messageToUser(String message, String username) {
-		if (isUserExist(username)) {
+		if (isUserExist(username) && message != null) {
 			for(ServerThread connection : connectionsList) {
 				if (username.equals(connection.getClient().getUsername())) {
 					connection.messageToClient(message);
@@ -87,9 +93,11 @@ public class Server {
 	}
 
 	public boolean isUserExist(String username) {
-		for (ClientInfo client : clientsList) {
-			if (username.toLowerCase().equals(client.getUsername().toLowerCase())) {
-				return true;
+		if (username != null) {
+			for (ClientInfo client : clientsList) {
+				if (username.toLowerCase().equals(client.getUsername().toLowerCase())) {
+					return true;
+				}
 			}
 		}
 		return false;
