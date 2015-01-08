@@ -9,7 +9,6 @@ public class CommandTest {
 	int state=0;
 	@Test
 	public void testInvalidCommands() {
-		//System.out.println(cm.authorization("IDEN aiman"));
 		assertEquals(false, cm.validCommand(""));
 		assertEquals(false, cm.validCommand(" "));
 		assertEquals(false, cm.validCommand(null));

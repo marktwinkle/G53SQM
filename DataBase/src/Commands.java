@@ -82,7 +82,6 @@ public class Commands {
 //		if (request==" ")
 //			return false;
 		if(request==null){
-			System.out.println("HERE");
 			return false;
 		}
 		String [] inputLine = request.split(" ");
