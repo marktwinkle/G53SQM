@@ -13,8 +13,6 @@ public class Client {
 	private final boolean AUTO_FLUSH = true;
 	private final String CLIENT_REQUEST_QUIT = "QUIT";
 	private final String SERVER_RESPONSE_THREAD_NAME = "ServerResponseThread";
-	private String response;
-	private String request;
 	private Socket connection;
 	private PrintWriter serverOutput;
 	private BufferedReader serverInput;
@@ -64,6 +62,8 @@ public class Client {
 
             @Override
             public void run() {
+            	String response;
+            	
                 while (!Thread.interrupted()) {
                 	try {
                     	while ((response = serverInput.readLine()) != null) {
@@ -78,6 +78,7 @@ public class Client {
         responseThread.start();
         
         running = true;
+        String request;
 		while (running) {
 			request = clientInput.readLine();
 			if (request != null) {
