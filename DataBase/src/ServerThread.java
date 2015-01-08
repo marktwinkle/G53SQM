@@ -199,9 +199,7 @@ public class ServerThread extends Thread {
 
 			message = client.getUsername()+" --> ";
 			//concatenate message
-			for (int i = ARG_TWO ; i < inputLine.length ; i++) {
-				message += inputLine[i]+" ";
-			}
+			concatenateMessage(ARG_TWO, inputLine);
 
 			//send message
 			if(server.messageToUser(message, destinationUsername)) {
@@ -214,9 +212,7 @@ public class ServerThread extends Thread {
 		case "HAIL": {
 			message = client.getUsername()+" to everyone --> ";
 			//concatenate message
-			for (int i = ARG_ONE ; i < inputLine.length ; i++) {
-				message += inputLine[i]+" ";
-			}
+			concatenateMessage(ARG_ONE, inputLine);
 			server.messageToEveryone(message);
 			client.increaseMessagesCounter();
 			response = "Broadcast message sent";
@@ -299,5 +295,19 @@ public class ServerThread extends Thread {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Concatenate the message in inputLine
+	 * @param startingIndex: Index of the message argument
+	 * @param inputLine: the client request split at white spaces
+	 * @return
+	 */
+	private String concatenateMessage(int startingIndex, String [] inputLine) {
+		String message = "";
+		for (int i = startingIndex ; i < inputLine.length ; i++) {
+			message += inputLine[i]+" ";
+		}
+		return message;
 	}
 }
