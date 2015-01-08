@@ -1,7 +1,3 @@
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-
 
 public class Commands {
 	private final int COMMAND = 0;
@@ -13,15 +9,8 @@ public class Commands {
 	private final String OK = "+OK ";
 	private final String ERR = "-ERR ";
 	
-	//Error messages
-	private final String ERROR_SETUP_STREAMS = "FAILED TO SETUP INPUT/OUTPUT STREAMS";
-	private final String ERROR_READ_INPUT = "FAILED TO READ INPUT";
 	
 	private Server server;
-	private Socket connectionSocket;
-	private PrintWriter output;
-	private BufferedReader input; 
-	private boolean running;
 	private int state;
 	private ClientInfo client;
 	
