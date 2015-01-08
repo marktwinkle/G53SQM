@@ -33,6 +33,7 @@ public class Server {
 			// when port is busy
 		} catch (IOException ioException) {
 			System.err.println("Could not listen on port " + portNumber);
+			ioException.printStackTrace();
 			System.exit(-1);
 		}
 	}

@@ -17,6 +17,7 @@ public class RunServer {
 			// invalid command line arguments 
 		} catch (NumberFormatException numberFormatException) {
 			System.out.println("Usage: java Server <port number> <Server timeout (in seconds)>");
+			numberFormatException.printStackTrace();
 			System.exit(1);
 		}
 	}

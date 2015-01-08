@@ -18,6 +18,7 @@ public class RunClient {
 		// invalid command line arguments
 		} catch (NumberFormatException numberFormatException) {
 			System.err.println("Usage: java EchoClient <host name> <port number>");
+			numberFormatException.printStackTrace();
 			System.exit(1);
 		}
 	}

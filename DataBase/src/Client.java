@@ -12,6 +12,7 @@ public class Client {
 
 	private final boolean AUTO_FLUSH = true;
 	private final String CLIENT_REQUEST_QUIT = "QUIT";
+	private final String SERVER_RESPONSE_THREAD_NAME = "ServerResponseThread";
 	private String response;
 	private String request;
 	private Socket connection;
@@ -29,9 +30,11 @@ public class Client {
 			setupClientStreams(clientInput,clientOutput);
 		} catch (UnknownHostException unknownHostException) {
 			System.err.println("Don't know about host " + hostName);
+			unknownHostException.printStackTrace();
 			System.exit(1);
 		} catch (IOException ioException) {
 			System.err.println("Couldn't get I/O for the connection to " + hostName);
+			ioException.printStackTrace();
 			System.exit(1);
 		}
 	}
@@ -71,7 +74,7 @@ public class Client {
 					}
                 }
             }
-        });
+        }, SERVER_RESPONSE_THREAD_NAME);
         responseThread.start();
         
         running = true;
