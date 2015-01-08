@@ -199,7 +199,7 @@ public class ServerThread extends Thread {
 
 			message = client.getUsername()+" --> ";
 			//concatenate message
-			concatenateMessage(ARG_TWO, inputLine);
+			message += concatenateMessage(ARG_TWO, inputLine);
 
 			//send message
 			if(server.messageToUser(message, destinationUsername)) {
@@ -212,7 +212,7 @@ public class ServerThread extends Thread {
 		case "HAIL": {
 			message = client.getUsername()+" to everyone --> ";
 			//concatenate message
-			concatenateMessage(ARG_ONE, inputLine);
+			message += concatenateMessage(ARG_ONE, inputLine);
 			server.messageToEveryone(message);
 			client.increaseMessagesCounter();
 			response = "Broadcast message sent";
@@ -284,10 +284,9 @@ public class ServerThread extends Thread {
 		} else {
 			//check characters
 			for (int i = 0 ; i < username.length() ; i++) {
-				System.out.print(username.charAt(i)+"\t"+ Character.getNumericValue(username.charAt(i))+"\n");
 				if (!(
 						(username.charAt(i) >= 'a' && username.charAt(i) <= 'z') || 
-						(username.charAt(i) >= 'A' && username.charAt(i) >= 'Z') ||
+						(username.charAt(i) >= 'A' && username.charAt(i) <= 'Z') ||
 						(username.charAt(i) >= '0' && username.charAt(i) <= '9') 
 						)) {
 					return false;
