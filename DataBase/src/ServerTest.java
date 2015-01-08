@@ -146,5 +146,6 @@ public class ServerTest {
 		usersList = usersList.replace(LF, EMPTY_STRING);
 		usersList = usersList.replace(CR, EMPTY_STRING);
 		assertEquals(testUsername1.length()+testUsername2.length(), usersList.length());
+		//FIXME: Not equals
 	}
 }
