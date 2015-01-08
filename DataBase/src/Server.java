@@ -5,52 +5,51 @@ import java.util.List;
 
 public class Server {
 	private int portNumber;
-	private ServerSocket serverSocket;
 	private List<ServerThread> connectionsList;
 	private List<ClientInfo> clientsList;
 
 	public Server(int portNumber) {
-
 		this.portNumber = portNumber;
-		try {
-			serverSocket = new ServerSocket();
-		} catch (IOException ioException) {
-			// when port is busy
-			System.err.println("Could not listen on port " + portNumber);
-			ioException.printStackTrace();
-			shutdownServer();
-			System.exit(-1);
-		}
 		connectionsList = new ArrayList<ServerThread>();
 		clientsList = new ArrayList<ClientInfo>();
+
+		runServer();
 	}
 
-	public void runServer() {
-		System.out.println("Server running on port "+portNumber);
-		while(true) {
-			try {
-
-				ServerThread serverThread = new ServerThread(this, serverSocket.accept());
-				connectionsList.add(serverThread);
-				serverThread.start();
-			} catch (IOException e) {
-				System.err.println("UNABLE TO SETUP CONNECTION");
-				e.printStackTrace();
+	private void runServer() {
+		
+		// open server socket and wait for client connections
+		try (ServerSocket serverSocket = new ServerSocket(portNumber)) { 
+			System.out.println("Server running on port "+portNumber);
+			while(true) {
+				try {
+					
+					ServerThread serverThread = new ServerThread(this, serverSocket.accept());
+					connectionsList.add(serverThread);
+					serverThread.start();
+				} catch (IOException e) {
+					System.err.println("UNABLE TO SETUP CONNECTION");
+					e.printStackTrace();
+				}
 			}
+		// when port is busy
+		} catch (IOException ioException) {
+			System.err.println("Could not listen on port " + portNumber);
+			System.exit(-1);
 		}
 	}
 
 	public void shutdownServer() {
-		if(serverSocket != null && !serverSocket.isClosed()) {
-			try {
-				serverSocket.close();
-			} catch (IOException iOException) {
-				System.err.println("Unable to close socket");
-				iOException.printStackTrace();
-			}	
-		} else {
-			System.err.println("Socket is not open");
-		}
+//		if(serverSocket != null && !serverSocket.isClosed()) {
+//			try {
+//				serverSocket.close();
+//			} catch (IOException iOException) {
+//				System.err.println("Unable to close socket");
+//				iOException.printStackTrace();
+//			}	
+//		} else {
+//			System.err.println("Socket is not open");
+//		}
 		
 	}
 
