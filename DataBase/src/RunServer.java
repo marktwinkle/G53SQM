@@ -12,7 +12,7 @@ public class RunServer {
 
 		try {
 			int portNumber = Integer.parseInt(args[0]);
-			new Server(portNumber);;
+			new Server(portNumber).runServer();
 
 			// invalid command line arguments 
 		} catch (NumberFormatException numberFormatException) {

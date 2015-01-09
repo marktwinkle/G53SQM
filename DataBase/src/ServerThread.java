@@ -234,6 +234,10 @@ public class ServerThread extends Thread {
 	 */
 	private boolean validCommand (String request) {
 		String [] inputLine = request.split(" ");
+		
+		if(inputLine.length==0){
+			return false;
+		}
 
 		switch (inputLine[COMMAND]) {
 

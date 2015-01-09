@@ -13,13 +13,12 @@ public class Server {
 		connectionsList = new ArrayList<ServerThread>();
 		clientsList = new ArrayList<ClientInfo>();
 
-		runServer();
 	}
 
 	/**
 	 * Opens server socket and waits for client connections
 	 */
-	private void runServer() {
+	public void runServer() {
 		
 		
 		try (ServerSocket serverSocket = new ServerSocket(portNumber)) { 

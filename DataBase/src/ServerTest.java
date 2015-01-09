@@ -14,6 +14,7 @@ public class ServerTest {
 	@Before
 	public void initialization() {
 		testServer = new Server(PORT_NUMBER);
+	
 	}
 	
 	@Test
