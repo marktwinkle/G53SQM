@@ -16,9 +16,12 @@ public class Server {
 		runServer();
 	}
 
+	/**
+	 * Opens server socket and waits for client connections
+	 */
 	private void runServer() {
 		
-		// open server socket and wait for client connections
+		
 		try (ServerSocket serverSocket = new ServerSocket(portNumber)) { 
 			System.out.println("Server running on port "+portNumber);
 			while(true) {
@@ -39,6 +42,9 @@ public class Server {
 		}
 	}
 
+	/**
+	 * Closes server socket
+	 */
 	public void shutdownServer() {
 //		if(serverSocket != null && !serverSocket.isClosed()) {
 //			try {
@@ -53,6 +59,11 @@ public class Server {
 		
 	}
 
+	/**
+	 * Adds a client to the list of active clients
+	 * @param client: the client to be added
+	 * @return true: if successfully added, false: otherwise
+	 */
 	public boolean addClient(ClientInfo client) {
 		if (client != null) {
 			clientsList.add(client);
@@ -62,6 +73,11 @@ public class Server {
 		return false;
 	}
 
+	/**
+	 * Removes a client from the list of active client
+	 * @param client: the client to be removed
+	 * @return true: if successfully removed, false: otherwise
+	 */
 	public boolean removeClient(ClientInfo client) {
 		if (clientsList.size() > 0) {
 			clientsList.remove(clientsList.indexOf(client));
@@ -76,6 +92,10 @@ public class Server {
 		return false;
 	}
 
+	/**
+	 * Lists the online username
+	 * @return String representing the list of logged in users
+	 */
 	public String getUsersList() {
 		String usersList = "";
 		for( ClientInfo client: clientsList){
@@ -84,10 +104,18 @@ public class Server {
 		return usersList;
 	}
 
+	/**
+	 * Gets the number of users connected to server
+	 * @return the number of logged users
+	 */
 	public int getClientsCount() {
 		return clientsList.size();
 	}
 
+	/**
+	 * Sends a message to every user the is connected to the server
+	 * @param message: the message to be sent
+	 */
 	public void messageToEveryone(String message){
 		for(ServerThread connection : connectionsList){
 			if (connection.getClient() != null) {
@@ -96,6 +124,12 @@ public class Server {
 		}
 	}
 
+	/**
+	 * Sends a message to a specific user that is connected to the server
+	 * @param message: the message to be sent
+	 * @param username: the username of recipient 
+	 * @return true: if successfully sent, false: otherwise
+	 */
 	public boolean messageToUser(String message, String username) {
 		if (isUserExist(username) && message != null) {
 			for(ServerThread connection : connectionsList) {
@@ -108,6 +142,11 @@ public class Server {
 		return false;
 	}
 
+	/**
+	 * Checks if a user is connected to the server
+	 * @param username: the username to be checked
+	 * @return true: if user exists, false: otherwise
+	 */
 	public boolean isUserExist(String username) {
 		if (username != null) {
 			for (ClientInfo client : clientsList) {
